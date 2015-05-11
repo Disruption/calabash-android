@@ -120,8 +120,8 @@ class Env
     is_windows? ? 'adb.exe' : 'adb'
   end
 
-  def self.ant_path
-    is_windows? ? "ant.bat" : "ant"
+  def self.gradle_path
+    is_windows? ? "./gradlew.bat" : "./gradlew"
   end
 
   def self.is_windows?

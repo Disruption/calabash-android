@@ -4,7 +4,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.isAssignableFro
 import static org.hamcrest.core.AllOf.allOf;
 
 import org.hamcrest.Matcher;
-import org.hamcrest.core.StringContains;
+import org.hamcrest.text.StringContains;
 
 import sh.calaba.espressobackend.Result;
 import sh.calaba.espressobackend.actions.Action;

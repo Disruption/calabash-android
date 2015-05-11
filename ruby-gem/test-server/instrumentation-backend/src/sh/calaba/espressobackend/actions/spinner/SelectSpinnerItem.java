@@ -4,7 +4,7 @@ import android.support.test.espresso.Espresso;
 import android.support.test.espresso.action.ViewActions;
 import android.support.test.espresso.matcher.ViewMatchers;
 
-import org.hamcrest.core.StringContains;
+import org.hamcrest.text.StringContains;
 
 import sh.calaba.espressobackend.EspressoInstrumentationBackend;
 import sh.calaba.espressobackend.Result;

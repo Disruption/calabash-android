@@ -7,7 +7,7 @@ import android.support.test.espresso.Espresso;
 import android.support.test.espresso.assertion.ViewAssertions;
 import android.support.test.espresso.matcher.ViewMatchers;
 
-import org.hamcrest.core.StringContains;
+import org.hamcrest.text.StringContains;
 
 public class ViewWithTextIsDisplayed implements Action {
     @Override

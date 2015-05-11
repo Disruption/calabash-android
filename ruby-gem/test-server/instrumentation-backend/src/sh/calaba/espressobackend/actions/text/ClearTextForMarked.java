@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.anyOf;
 
 import org.hamcrest.Matcher;
-import org.hamcrest.core.StringContains;
+import org.hamcrest.text.StringContains;
 
 import sh.calaba.espressobackend.EspressoInstrumentationBackend;
 import sh.calaba.espressobackend.Result;

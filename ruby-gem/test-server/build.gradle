@@ -1,0 +1,60 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:1.1.1'
+    }
+}
+
+apply plugin: 'android'
+
+android {
+    compileSdkVersion "Google Inc.:Google APIs:19"
+    buildToolsVersion "21.1.1"
+
+    packagingOptions {
+      exclude 'LICENSE.txt'
+    }
+
+    defaultConfig {
+        // Gradle's <instrumentation> replaced later by calabash-android-build.irb.
+        testApplicationId "sh.calaba.test"
+        testInstrumentationRunner "android.test.InstrumentationTestRunner"
+        testHandleProfiling true
+        testFunctionalTest true
+
+        minSdkVersion 8
+        targetSdkVersion 21
+        versionCode 1
+        versionName "1.0"
+    }
+
+    sourceSets {
+        // Unused minimal app to keep gradle happy for test build.
+        main.setRoot('dummy')
+
+        androidTest { //.setRoot('instrumentation-backend')
+            manifest.srcFile 'instrumentation-backend/AndroidManifest.xml'
+            java.srcDirs = ['instrumentation-backend/src']
+            resources.srcDirs = ['instrumentation-backend/src']
+            aidl.srcDirs = ['instrumentation-backend/aidl']
+            renderscript.srcDirs = ['instrumentation-backend/renderscript']
+            res.srcDirs = ['instrumentation-backend/res']
+            assets.srcDirs = ['instrumentation-backend//assets']
+        }
+    }
+}
+
+dependencies {
+    repositories {
+        mavenCentral()
+    }
+
+    androidTestCompile 'junit:junit-dep:4.8.+'
+    androidTestCompile 'org.hamcrest:hamcrest-core:1.1'
+    androidTestCompile 'org.hamcrest:hamcrest-library:1.1'
+    androidTestCompile 'com.jayway.android.robotium:robotium-solo:4.3.1'
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.0'
+}

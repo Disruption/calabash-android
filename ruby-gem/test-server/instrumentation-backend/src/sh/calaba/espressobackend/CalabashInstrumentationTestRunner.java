@@ -9,7 +9,7 @@ import android.os.Bundle;
 import android.support.test.runner.AndroidJUnitRunner;
 import android.test.InstrumentationTestRunner;
 
-public class CalabashInstrumentationTestRunner extends InstrumentationTestRunner {
+public class CalabashInstrumentationTestRunner extends AndroidJUnitRunner {
 	@Override
     public void onCreate(Bundle arguments) {
 		try {
