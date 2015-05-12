@@ -2,12 +2,12 @@ package sh.calaba.espressobackend;
 
 import java.lang.reflect.Method;
 
-import android.app.Activity;
 import sh.calaba.espressobackend.actions.HttpServer;
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnitRunner;
-import android.test.InstrumentationTestRunner;
 
 public class CalabashInstrumentationTestRunner extends AndroidJUnitRunner {
 	@Override
@@ -48,5 +48,6 @@ public class CalabashInstrumentationTestRunner extends AndroidJUnitRunner {
 
         super.onCreate(arguments);
 
+        InstrumentationRegistry.registerInstance(this, arguments);
 	}	
 }
