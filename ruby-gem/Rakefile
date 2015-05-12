@@ -13,7 +13,7 @@ end
 def build
   test_server_template_dir = File.join(File.dirname(__FILE__), 'test-server')
 
-  calabash_js_dir = File.join(test_server_template_dir, 'calabash-js/src')
+  calabash_js_dir = File.join(test_server_template_dir, 'calabash-js', 'src', '.')
   fail "#{calabash_js_dir} does not exist" unless File.directory?(calabash_js_dir)
 
   Dir.mktmpdir do |workspace_dir|
