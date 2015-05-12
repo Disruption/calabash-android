@@ -5,16 +5,15 @@ import java.util.List;
 
 import sh.calaba.espressobackend.query.espresso.MapViewCaptorMatcher;
 import sh.calaba.espressobackend.query.espresso.ViewCaptor;
-
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.Region;
 import android.os.SystemClock;
+import android.support.test.espresso.Espresso;
+import android.support.test.espresso.matcher.ViewMatchers;
 import android.util.Log;
 
-import com.google.android.apps.common.testing.ui.espresso.Espresso;
-import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.MapView;

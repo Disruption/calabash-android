@@ -11,7 +11,7 @@ import sh.calaba.espressobackend.actions.Action;
 
 public class PressKey implements Action {
     @Override
-    public Result execute(String ... args) {
+    public Result execute(String... args) {
         if (args.length != 1) {
             return Result.failedResult("This action takes one argument ([String/int] key).");
         }
@@ -24,7 +24,7 @@ public class PressKey implements Action {
         } else {
             keyCode = getKey(keyString);
         }
-        
+
         if (keyCode == null || keyCode < 0) {
             return Result.failedResult("Could not find key code from argument '" + keyString + "'");
         }
@@ -64,7 +64,7 @@ public class PressKey implements Action {
         Class<?> keyEventClass = KeyEvent.class;
         try {
             Field field = keyEventClass.getField(keyName);
-            
+
             return field.getInt(null);
         } catch (NoSuchFieldException e) {
             return null;

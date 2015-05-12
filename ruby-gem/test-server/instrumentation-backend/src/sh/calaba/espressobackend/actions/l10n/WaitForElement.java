@@ -13,9 +13,9 @@
  */
 package sh.calaba.espressobackend.actions.l10n;
 
-import com.google.android.apps.common.testing.ui.espresso.Espresso;
-import com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions;
-import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
+import android.support.test.espresso.Espresso;
+import android.support.test.espresso.assertion.ViewAssertions;
+import android.support.test.espresso.matcher.ViewMatchers;
 
 import sh.calaba.espressobackend.Result;
 import sh.calaba.espressobackend.actions.Action;

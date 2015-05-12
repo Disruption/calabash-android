@@ -13,6 +13,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import sh.calaba.espressobackend.EspressoInstrumentationBackend;
 import sh.calaba.espressobackend.query.ast.UIQueryUtils;
 import sh.calaba.espressobackend.query.espresso.ViewCaptor;
 import sh.calaba.espressobackend.query.espresso.WebViewCaptorMatcher;
@@ -31,8 +32,9 @@ import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebStorage;
 import android.webkit.WebView;
+import android.webkit.WebChromeClient.CustomViewCallback;
 
-import com.google.android.apps.common.testing.ui.espresso.Espresso;
+import android.support.test.espresso.Espresso;
 
 public class CalabashChromeClient extends WebChromeClient {
 	private WebChromeClient mWebChromeClient;
@@ -51,83 +53,89 @@ public class CalabashChromeClient extends WebChromeClient {
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
-		}  else {
-				
-				/*
-				 * pick up the chromeClient from the webView
-				 * this is required because in Jelly Bean there is no getWebChromeClient
-				 * above sdk 16.This will help HTML5 hybrid application (Cordova) to pass the prompt messages 
-				 * to Native code. Previously the CalabashChromeClient did not populate the mWebChromeClient
-				 * which lead to the Cordova.exec messages not forward to the Cordova ChromeClient.
-				 */
-				Field field = getChromeClientField(webView.getClass());
-				if (field == null) {
-					mWebChromeClient = null;
+		} else {
+
+			/*
+			 * pick up the chromeClient from the webView this is required
+			 * because in Jelly Bean there is no getWebChromeClient above sdk
+			 * 16.This will help HTML5 hybrid application (Cordova) to pass the
+			 * prompt messages to Native code. Previously the
+			 * CalabashChromeClient did not populate the mWebChromeClient which
+			 * lead to the Cordova.exec messages not forward to the Cordova
+			 * ChromeClient.
+			 */
+			Field field = getChromeClientField(webView.getClass());
+			if (field == null) {
+				mWebChromeClient = null;
+			} else {
+				try {
+					field.setAccessible(true);
+					mWebChromeClient = (WebChromeClient) field.get(webView);
+				} catch (IllegalArgumentException e) {
+					e.printStackTrace();
+					throw new UnableToFindChromeClientException(e, webView);
+				} catch (IllegalAccessException e) {
+
+					e.printStackTrace();
+					throw new UnableToFindChromeClientException(e, webView);
 				}
-				else {
-					try {
-						field.setAccessible(true);
-						mWebChromeClient = (WebChromeClient) field.get(webView);
-					} catch (IllegalArgumentException e) {					
-						e.printStackTrace();
-						throw new UnableToFindChromeClientException(e, webView);
-					} catch (IllegalAccessException e) {
-						
-						e.printStackTrace();
-						throw new UnableToFindChromeClientException(e, webView);
-					}	
-				}
-	
-							
+			}
+
 		}
 
-        Runnable setWebChromeClientRunnable = new Runnable() {
-            @Override
-            public void run() {
-                Class<?> webViewClass = webView.getClass();
-                boolean isCordovaWebView = (webViewClass.getName().equals("org.apache.cordova.CordovaWebView"));
+		Runnable setWebChromeClientRunnable = new Runnable() {
+			@Override
+			public void run() {
+				Class<?> webViewClass = webView.getClass();
+				boolean isCordovaWebView = (webViewClass.getName()
+						.equals("org.apache.cordova.CordovaWebView"));
 
-                // Cordova web view changed its implementation of setWebChromeClient.
-                //   it will now try to cast the given WebChromeClient to a CordovaChromeClient,
-                //   thus failing
-                if (isCordovaWebView) {
-                    try {
-                        CalabashChromeClient.this.webViewSetWebChromeClient(CalabashChromeClient.this);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                } else {
-                    webView.setWebChromeClient(CalabashChromeClient.this);
-                }
-            }
-        };
+				// Cordova web view changed its implementation of
+				// setWebChromeClient.
+				// it will now try to cast the given WebChromeClient to a
+				// CordovaChromeClient,
+				// thus failing
+				if (isCordovaWebView) {
+					try {
+						CalabashChromeClient.this
+								.webViewSetWebChromeClient(CalabashChromeClient.this);
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				} else {
+					webView.setWebChromeClient(CalabashChromeClient.this);
+				}
+			}
+		};
 
-        UIQueryUtils.runOnViewThread(webView, setWebChromeClientRunnable);
+		UIQueryUtils.runOnViewThread(webView, setWebChromeClientRunnable);
 	}
 
-    private void webViewSetWebChromeClient(WebChromeClient webChromeClient) throws NoSuchFieldException, IllegalAccessException,
-            NoSuchMethodException, InvocationTargetException {
-        String fieldName;
+	private void webViewSetWebChromeClient(WebChromeClient webChromeClient)
+			throws NoSuchFieldException, IllegalAccessException,
+			NoSuchMethodException, InvocationTargetException {
+		String fieldName;
 
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
-            fieldName = "mProvider";
-        } else {
-            fieldName = "mCallbackProxy";
-        }
+		if (Build.VERSION.SDK_INT > Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+			fieldName = "mProvider";
+		} else {
+			fieldName = "mCallbackProxy";
+		}
 
-        Field field = android.webkit.WebView.class.getDeclaredField(fieldName);
-        field.setAccessible(true);
-        Object object = field.get(webView);
+		Field field = android.webkit.WebView.class.getDeclaredField(fieldName);
+		field.setAccessible(true);
+		Object object = field.get(webView);
 
-        String methodName = "setWebChromeClient";
-        Method method = object.getClass().getMethod(methodName, WebChromeClient.class);
-        method.invoke(object, webChromeClient);
-    }
+		String methodName = "setWebChromeClient";
+		Method method = object.getClass().getMethod(methodName,
+				WebChromeClient.class);
+		method.invoke(object, webChromeClient);
+	}
 
 	/*
-	 * returns the chromeClient from the WebView.
-	 * recursively moves up to its superClass to get the chromeClient 
-	 * if there is no chromeClient it returns null.
+	 * returns the chromeClient from the WebView. recursively moves up to its
+	 * superClass to get the chromeClient if there is no chromeClient it returns
+	 * null.
 	 */
 	private Field getChromeClientField(Class currentClass) {
 		if (currentClass == null)
@@ -146,7 +154,7 @@ public class CalabashChromeClient extends WebChromeClient {
 			r.confirm("CALABASH_ACK");
 			System.out.println("onJsPrompt: " + message);
 			String jsonResponse = message.replaceFirst("calabash:", "");
-			scriptFuture.setResult(jsonResponse);			
+			scriptFuture.setResult(jsonResponse);
 			return true;
 		} else {
 			if (mWebChromeClient == null) {
@@ -176,11 +184,11 @@ public class CalabashChromeClient extends WebChromeClient {
 		List<CalabashChromeClient> webViews = new ArrayList<CalabashChromeClient>();
 		WebViewCaptorMatcher webViewCaptorMatcher = new WebViewCaptorMatcher();
 		Espresso.onView(webViewCaptorMatcher).perform(new ViewCaptor());
-		List<View> views = webViewCaptorMatcher.getCapturedViews();
-		
-		for (View view : views) {
-				WebView webView = (WebView) view;
-				webViews.add(prepareWebView(webView));
+		List<WebView> views = webViewCaptorMatcher.getCapturedViews();
+
+		for (WebView view : views) {
+			webViews.add(prepareWebView(view));
+
 		}
 		return webViews;
 
@@ -190,142 +198,222 @@ public class CalabashChromeClient extends WebChromeClient {
 		return scriptFuture;
 	}
 
-    public void evaluateCalabashScript(String script) {
-        webView.evaluateJavascript(script, new ValueCallback<String>() {
-            public void onReceiveValue(String rawResponseJSON) {
-                String jsonResponse = null;
+	public void evaluateCalabashScript(String script) {
+		webView.evaluateJavascript(script, new ValueCallback<String>() {
+			public void onReceiveValue(String rawResponseJSON) {
+				String jsonResponse = null;
 
-                try {
-                    jsonResponse = new ObjectMapper().readValue(
-                            rawResponseJSON, new TypeReference<String>() {
-                    });
-                } catch (IOException e) {
-                    throw new RuntimeException("Incorrect JSON format returned from javascript: " + rawResponseJSON, e);
-                }
+				try {
+					jsonResponse = new ObjectMapper().readValue(
+							rawResponseJSON, new TypeReference<String>() {
+							});
+				} catch (IOException e) {
+					throw new RuntimeException(
+							"Incorrect JSON format returned from javascript: "
+									+ rawResponseJSON, e);
+				}
 
-                scriptFuture.setResult(jsonResponse);
-            }
-        });
-    }
+				scriptFuture.setResult(jsonResponse);
+			}
+		});
+	}
 
-    /* Overwrite all methods to delegate to previous webChromeClient */
+	/* Overwrite all methods to delegate to previous webChromeClient */
 
-    @Override
-    public void onProgressChanged(WebView view, int newProgress) {
-        mWebChromeClient.onProgressChanged(view, newProgress);
-    }
+	@Override
+	public void onProgressChanged(WebView view, int newProgress) {
+		if (mWebChromeClient != null) {
+			mWebChromeClient.onProgressChanged(view, newProgress);
+		}
+	}
 
-    @Override
-    public void onReceivedTitle(WebView view, String title) {
-        mWebChromeClient.onReceivedTitle(view, title);
-    }
+	@Override
+	public void onReceivedTitle(WebView view, String title) {
+		if (mWebChromeClient != null) {
+			mWebChromeClient.onReceivedTitle(view, title);
+		}
+	}
 
-    @Override
-    public void onReceivedIcon(WebView view, Bitmap icon) {
-        mWebChromeClient.onReceivedIcon(view, icon);
-    }
+	@Override
+	public void onReceivedIcon(WebView view, Bitmap icon) {
+		if (mWebChromeClient != null) {
+			mWebChromeClient.onReceivedIcon(view, icon);
+		}
+	}
 
-    @Override
-    public void onReceivedTouchIconUrl(WebView view, String url, boolean precomposed) {
-        mWebChromeClient.onReceivedTouchIconUrl(view, url, precomposed);
-    }
+	@Override
+	public void onReceivedTouchIconUrl(WebView view, String url,
+			boolean precomposed) {
+		if (mWebChromeClient != null) {
+			mWebChromeClient.onReceivedTouchIconUrl(view, url, precomposed);
+		}
+	}
 
-    @Override
-    public void onShowCustomView(View view, CustomViewCallback callback) {
-        mWebChromeClient.onShowCustomView(view, callback);
-    }
+	@Override
+	public void onShowCustomView(View view, CustomViewCallback callback) {
+		if (mWebChromeClient != null) {
+			mWebChromeClient.onShowCustomView(view, callback);
+		}
+	}
 
-    @Override
-    public void onShowCustomView(View view, int requestedOrientation, CustomViewCallback callback) {
-        mWebChromeClient.onShowCustomView(view, requestedOrientation, callback);
-    }
+	@Override
+	public void onShowCustomView(View view, int requestedOrientation,
+			CustomViewCallback callback) {
+		if (mWebChromeClient != null) {
+			mWebChromeClient.onShowCustomView(view, requestedOrientation,
+					callback);
+		}
+	}
 
-    @Override
-    public void onHideCustomView() {
-        mWebChromeClient.onHideCustomView();
-    }
+	@Override
+	public void onHideCustomView() {
+		if (mWebChromeClient != null) {
+			mWebChromeClient.onHideCustomView();
+		}
+	}
 
-    @Override
-    public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
-        return mWebChromeClient.onCreateWindow(view, isDialog, isUserGesture, resultMsg);
-    }
+	@Override
+	public boolean onCreateWindow(WebView view, boolean isDialog,
+			boolean isUserGesture, Message resultMsg) {
+		if (mWebChromeClient != null) {
+			return mWebChromeClient.onCreateWindow(view, isDialog,
+					isUserGesture, resultMsg);
+		}
 
-    @Override
-    public void onRequestFocus(WebView view) {
-        mWebChromeClient.onRequestFocus(view);
-    }
+		return false;
+	}
 
-    @Override
-    public void onCloseWindow(WebView window) {
-        mWebChromeClient.onCloseWindow(window);
-    }
+	@Override
+	public void onRequestFocus(WebView view) {
+		if (mWebChromeClient != null) {
+			mWebChromeClient.onRequestFocus(view);
+		}
+	}
 
-    @Override
-    public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
-        return mWebChromeClient.onJsAlert(view, url, message, result);
-    }
+	@Override
+	public void onCloseWindow(WebView window) {
+		if (mWebChromeClient != null) {
+			mWebChromeClient.onCloseWindow(window);
+		}
+	}
 
-    @Override
-    public boolean onJsConfirm(WebView view, String url, String message, JsResult result) {
-        return mWebChromeClient.onJsConfirm(view, url, message, result);
-    }
+	@Override
+	public boolean onJsAlert(WebView view, String url, String message,
+			JsResult result) {
+		if (mWebChromeClient != null) {
+			return mWebChromeClient.onJsAlert(view, url, message, result);
+		}
 
-    @Override
-    public boolean onJsBeforeUnload(WebView view, String url, String message, JsResult result) {
-        return mWebChromeClient.onJsBeforeUnload(view, url, message, result);
-    }
+		return false;
+	}
 
-    @Override
-    public void onExceededDatabaseQuota(String url, String databaseIdentifier, long quota, long estimatedDatabaseSize, long totalQuota, WebStorage.QuotaUpdater quotaUpdater) {
-        mWebChromeClient.onExceededDatabaseQuota(url, databaseIdentifier, quota, estimatedDatabaseSize, totalQuota, quotaUpdater);
-    }
+	@Override
+	public boolean onJsConfirm(WebView view, String url, String message,
+			JsResult result) {
+		if (mWebChromeClient != null) {
+			return mWebChromeClient.onJsConfirm(view, url, message, result);
+		}
 
-    @Override
-    public void onReachedMaxAppCacheSize(long requiredStorage, long quota, WebStorage.QuotaUpdater quotaUpdater) {
-        mWebChromeClient.onReachedMaxAppCacheSize(requiredStorage, quota, quotaUpdater);
-    }
+		return false;
+	}
 
-    @Override
-    public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
-        mWebChromeClient.onGeolocationPermissionsShowPrompt(origin, callback);
-    }
+	@Override
+	public boolean onJsBeforeUnload(WebView view, String url, String message,
+			JsResult result) {
+		if (mWebChromeClient != null) {
+			return mWebChromeClient
+					.onJsBeforeUnload(view, url, message, result);
+		}
 
-    @Override
-    public void onGeolocationPermissionsHidePrompt() {
-        mWebChromeClient.onGeolocationPermissionsHidePrompt();
-    }
+		return false;
+	}
 
-    @Override
-    public boolean onJsTimeout() {
-        return mWebChromeClient.onJsTimeout();
-    }
+	@Override
+	public void onExceededDatabaseQuota(String url, String databaseIdentifier,
+			long quota, long estimatedDatabaseSize, long totalQuota,
+			WebStorage.QuotaUpdater quotaUpdater) {
+		if (mWebChromeClient != null) {
+			mWebChromeClient.onExceededDatabaseQuota(url, databaseIdentifier,
+					quota, estimatedDatabaseSize, totalQuota, quotaUpdater);
+		}
+	}
 
-    @Override
-    public void onConsoleMessage(String message, int lineNumber, String sourceID) {
-        mWebChromeClient.onConsoleMessage(message, lineNumber, sourceID);
-    }
+	@Override
+	public void onReachedMaxAppCacheSize(long requiredStorage, long quota,
+			WebStorage.QuotaUpdater quotaUpdater) {
+		if (mWebChromeClient != null) {
+			mWebChromeClient.onReachedMaxAppCacheSize(requiredStorage, quota,
+					quotaUpdater);
+		}
+	}
 
-    @Override
-    public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
-        return mWebChromeClient.onConsoleMessage(consoleMessage);
-    }
+	@Override
+	public void onGeolocationPermissionsShowPrompt(String origin,
+			GeolocationPermissions.Callback callback) {
+		if (mWebChromeClient != null) {
+			mWebChromeClient.onGeolocationPermissionsShowPrompt(origin,
+					callback);
+		}
+	}
 
-    @Override
-    public Bitmap getDefaultVideoPoster() {
-        return mWebChromeClient.getDefaultVideoPoster();
-    }
+	@Override
+	public void onGeolocationPermissionsHidePrompt() {
+		if (mWebChromeClient != null) {
+			mWebChromeClient.onGeolocationPermissionsHidePrompt();
+		}
+	}
 
-    @Override
-    public View getVideoLoadingProgressView() {
-        return mWebChromeClient.getVideoLoadingProgressView();
-    }
+	@Override
+	public boolean onJsTimeout() {
+		if (mWebChromeClient != null) {
+			return mWebChromeClient.onJsTimeout();
+		}
 
-    @Override
-    public void getVisitedHistory(ValueCallback<String[]> callback) {
-        mWebChromeClient.getVisitedHistory(callback);
-    }
+		return false;
+	}
 
-    @SuppressWarnings("rawtypes")
+	@Override
+	public void onConsoleMessage(String message, int lineNumber, String sourceID) {
+		if (mWebChromeClient != null) {
+			mWebChromeClient.onConsoleMessage(message, lineNumber, sourceID);
+		}
+	}
+
+	@Override
+	public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+		if (mWebChromeClient != null) {
+			return mWebChromeClient.onConsoleMessage(consoleMessage);
+		}
+
+		return false;
+	}
+
+	@Override
+	public Bitmap getDefaultVideoPoster() {
+		if (mWebChromeClient != null) {
+			return mWebChromeClient.getDefaultVideoPoster();
+		}
+
+		return null;
+	}
+
+	@Override
+	public View getVideoLoadingProgressView() {
+		if (mWebChromeClient != null) {
+			return mWebChromeClient.getVideoLoadingProgressView();
+		}
+
+		return null;
+	}
+
+	@Override
+	public void getVisitedHistory(ValueCallback<String[]> callback) {
+		if (mWebChromeClient != null) {
+			mWebChromeClient.getVisitedHistory(callback);
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
 	public static class WebFuture implements Future {
 		private final ConditionVariable eventHandled;
 		private volatile boolean complete;
@@ -384,21 +472,21 @@ public class CalabashChromeClient extends WebChromeClient {
 			return complete;
 		}
 
-		public String getAsString() {				
+		public String getAsString() {
 			try {
-				get(10,TimeUnit.SECONDS);
+				get(10, TimeUnit.SECONDS);
 				return getResult();
 			} catch (Exception e) {
 				e.printStackTrace();
 				throw new RuntimeException(e);
-			}			
+			}
 		}
-		
+
 		@SuppressWarnings("unchecked")
-		public Map asMap() {			
+		public Map asMap() {
 			HashMap m = new HashMap();
 			m.put("webView", webView);
-			m.put("result",getResult());			
+			m.put("result", getResult());
 			return m;
 		}
 	}

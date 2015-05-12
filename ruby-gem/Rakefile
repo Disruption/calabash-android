@@ -13,41 +13,65 @@ end
 def build
   test_server_template_dir = File.join(File.dirname(__FILE__), 'test-server')
 
+  calabash_js_dir = File.join(test_server_template_dir, 'calabash-js', 'src', '.')
+  fail "#{calabash_js_dir} does not exist" unless File.directory?(calabash_js_dir)
+
   Dir.mktmpdir do |workspace_dir|
 
-    @test_server_dir = File.join(workspace_dir, 'test-server')
+    test_server_dir = File.join(workspace_dir, 'test-server')
     FileUtils.cp_r(test_server_template_dir, workspace_dir)
 
+    backend_dir = File.join(test_server_dir, 'instrumentation-backend')
+    backend_assets_dir = File.join(backend_dir, 'assets')
+    FileUtils.cp_r(calabash_js_dir, backend_assets_dir)
+
+    backend_src_dir = File.join(backend_dir, 'src')
+    backends = %w(instrumentationbackend espressobackend)
+    backend_actions = backends.collect { |b| "#{backend_src_dir}/sh/calaba/#{b}/actions" }
+
+    version_token = '####VERSION####'
+    backend_actions.each do |b|
+        file = "#{b}/version/Version.java"
+        data = File.open(file, 'r') { |f| f.read }
+        raise "No #{version_token} found in #{file}" unless data.gsub!(version_token, Calabash::Android::VERSION)
+        File.open(file, 'w') { |f| f.write(data) }
+    end
+    
+    action_java_files = Dir.glob(backend_actions.collect { |v| "#{v}/**/*.java" })
+    action_classes = action_java_files.collect do |s|
+      s.gsub( "#{backend_src_dir}/", '').gsub('.java', '').gsub('/', '.')
+    end
+    File.open(File.join(backend_assets_dir, 'actions'), 'w') { |a| a << action_classes.join("\n") }
+
     args = [
-      Env.ant_path,
-      "clean",
-      "package",
-      "-debug",
-      "-Dtools.dir=\"#{Env.tools_dir}\"",
-      "-Dandroid.api.level=19",
-      "-Dversion=#{Calabash::Android::VERSION}",
+      Env.gradle_path,
+      'clean',
+      'assembleDebugAndroidTest'
     ]
-    Dir.chdir(@test_server_dir) do
+    Dir.chdir(test_server_dir) do
       STDOUT.sync = true
-      IO.popen(args.join(" ")) do |io|
+      IO.popen(args.join(' ')) do |io|
         io.each { |s| print s }
       end
       if $?.exitstatus != 0
-        puts "Could not build the test server. Please see the output above."
+        puts 'Could not build the test server. Please see the output above.'
         exit $?.exitstatus
       end
     end
 
-    FileUtils.mkdir_p "test_servers" unless File.exist? "test_servers"
+    FileUtils.mkdir_p 'test_servers' unless File.exist? 'test_servers'
 
-    FileUtils.cp(File.join(@test_server_dir, "bin", "Test_unsigned.apk"), File.join(File.dirname(__FILE__), 'lib/calabash-android/lib/TestServer.apk'))
+    built_apk = File.join(test_server_dir, 'build', 'outputs', 'apk',
+                          'test-server-debug-androidTest-unaligned.apk')
+    copied_apk = File.join(File.dirname(__FILE__), 'lib/calabash-android/lib/TestServer.apk')
+    FileUtils.cp(built_apk, copied_apk)
   end
 end
 
 task :build do
-  unless File.exists? "test-server/calabash-js/src"
-    puts "calabash-js not found!"
-    puts "For instuctions see: https://github.com/calabash/calabash-android/wiki/Building-calabash-android"
+  unless File.exists? 'test-server/calabash-js/src'
+    puts 'calabash-js not found!'
+    puts 'For instructions see: https://github.com/calabash/calabash-android/wiki/Building-calabash-android'
     exit 1
   end
 

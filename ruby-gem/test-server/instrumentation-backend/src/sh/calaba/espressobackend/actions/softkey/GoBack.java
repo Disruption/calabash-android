@@ -1,9 +1,8 @@
 package sh.calaba.espressobackend.actions.softkey;
 
 
-import com.google.android.apps.common.testing.ui.espresso.Espresso;
+import android.support.test.espresso.Espresso;
 
-import sh.calaba.espressobackend.EspressoInstrumentationBackend;
 import sh.calaba.espressobackend.Result;
 import sh.calaba.espressobackend.actions.Action;
 
@@ -12,7 +11,7 @@ public class GoBack implements Action {
 
     @Override
     public Result execute(String... args) {
-    	Espresso.pressBack();
+        Espresso.pressBack();
         return Result.successResult();
     }
 

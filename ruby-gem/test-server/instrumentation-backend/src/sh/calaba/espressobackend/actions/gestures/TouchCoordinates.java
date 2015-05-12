@@ -1,9 +1,9 @@
 package sh.calaba.espressobackend.actions.gestures;
 
 
-import com.google.android.apps.common.testing.ui.espresso.Espresso;
-import com.google.android.apps.common.testing.ui.espresso.action.Tap;
-import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
+import android.support.test.espresso.Espresso;
+import android.support.test.espresso.action.Tap;
+import android.support.test.espresso.matcher.ViewMatchers;
 
 import android.view.Display;
 import sh.calaba.espressobackend.EspressoInstrumentationBackend;

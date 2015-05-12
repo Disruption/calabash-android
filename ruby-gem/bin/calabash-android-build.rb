@@ -36,7 +36,7 @@ def calabash_build(app)
   Dir.mktmpdir do |workspace_dir|
     Dir.chdir(workspace_dir) do
       FileUtils.cp(unsigned_test_apk, "TestServer.apk")
-      FileUtils.cp(File.join(File.dirname(__FILE__), '..', 'test-server/AndroidManifest.xml'), "AndroidManifest.xml")
+      FileUtils.cp(File.join(File.dirname(__FILE__), '..', 'test-server/AndroidManifestTemplate.xml'), "AndroidManifest.xml")
 
       unless system %Q{"#{RbConfig.ruby}" -pi.bak -e "gsub(/#targetPackage#/, '#{package_name(app)}')" AndroidManifest.xml}
         raise "Could not replace package name in manifest"
@@ -52,9 +52,11 @@ def calabash_build(app)
 
       Zip::File.new("dummy.apk").extract("AndroidManifest.xml","customAndroidManifest.xml")
       Zip::File.open("TestServer.apk") do |zip_file|
+        zip_file.remove("AndroidManifest.xml")
         zip_file.add("AndroidManifest.xml", "customAndroidManifest.xml")
       end
     end
+    unsign_apk("#{workspace_dir}/TestServer.apk")
     keystore.sign_apk("#{workspace_dir}/TestServer.apk", test_server_file_name)
     begin
 

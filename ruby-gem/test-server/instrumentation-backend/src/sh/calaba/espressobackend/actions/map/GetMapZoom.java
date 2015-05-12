@@ -6,9 +6,9 @@ import sh.calaba.espressobackend.actions.Action;
 
 public class GetMapZoom implements Action {
 
-	@Override
+    @Override
     public Result execute(String... args) {
-    	int zoomLevel = EspressoInstrumentationBackend.mapViewUtils.getZoom();
+        int zoomLevel = EspressoInstrumentationBackend.mapViewUtils.getZoom();
         return new Result(true, Integer.toString(zoomLevel));
     }
 

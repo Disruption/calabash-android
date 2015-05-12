@@ -5,10 +5,10 @@ import org.hamcrest.Matchers;
 import sh.calaba.espressobackend.Result;
 import sh.calaba.espressobackend.actions.Action;
 
-import com.google.android.apps.common.testing.ui.espresso.Espresso;
-import com.google.android.apps.common.testing.ui.espresso.NoMatchingViewException;
-import com.google.android.apps.common.testing.ui.espresso.assertion.ViewAssertions;
-import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
+import android.support.test.espresso.Espresso;
+import android.support.test.espresso.NoMatchingViewException;
+import android.support.test.espresso.assertion.ViewAssertions;
+import android.support.test.espresso.matcher.ViewMatchers;
 
 public class ViewWithTextIsNotDisplayed implements Action {
     @Override

@@ -13,5 +13,5 @@ Then /^I long press "([^\"]*)" and select "([^\"]*)"$/ do |text, identifier|
 end
 
 Then /^I long press "([^\"]*)"$/ do |text|
-  long_press_when_element_exists("* {text CONTAINS[c] '#{text}'}")
+  perform_action('press_view_with_text' , text, 'LONG')
 end

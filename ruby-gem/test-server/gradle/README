@@ -1,0 +1,4 @@
+We have 2 wrappers as CI server might be using older version of Gradle due to older Android plugin.
+
+Developers only use standard Android Plugin implementation where CI uses Badoo Plugin therefore it might be
+runing on older Android Plugin version which requires older Gradle version

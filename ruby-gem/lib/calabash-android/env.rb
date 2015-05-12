@@ -120,8 +120,8 @@ class Env
     is_windows? ? 'adb.exe' : 'adb'
   end
 
-  def self.ant_path
-    is_windows? ? "ant.bat" : "ant"
+  def self.gradle_path
+    is_windows? ? "./gradlew.bat" : "./gradlew"
   end
 
   def self.is_windows?
@@ -129,7 +129,7 @@ class Env
   end
 
   def self.tools_dir
-    tools_dir = tools_directories.first
+    tools_dir = tools_directories.reverse[1]
     log "Found tools directory at '#{tools_dir}'"
     tools_dir
   end

@@ -217,11 +217,14 @@ module Calabash module Android
 
       if month.nil? && day.nil? && year_or_datestring.is_a?(String)
         date = Date.parse(year_or_datestring)
-        set_date(query_string, date.year, date.month, date.day)
+        year = date.year,
+		month = date.month
+		day = date.day
       else
         year = year_or_datestring
+	  end
+	  
         query(query_string, updateDate: [year, month-1, day])
-      end
     end
 
     def set_time(query_string, hour_or_timestring, minute=nil)

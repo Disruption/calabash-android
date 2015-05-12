@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Only required to placate Gradle's need for an app to build tests against -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="sh.calaba.dummy"
+    android:versionCode="3"
+    android:versionName="0.3.0" >
+
+    <uses-sdk android:minSdkVersion="6" />
+
+    <application android:label="CalabashTestServer">
+        <uses-library android:name="android.test.runner" />
+        <uses-library android:name="com.google.android.maps" android:required="false" />
+    </application>
+
+    <instrumentation
+        android:name="android.test.InstrumentationTestRunner"
+        android:targetPackage="sh.calaba" />
+</manifest>

@@ -1,27 +1,27 @@
 Then /^I enter "([^\"]*)" as "([^\"]*)"$/ do |text, content_description|
-  enter_text("android.widget.EditText {contentDescription LIKE[c] '#{content_description}'}", text)
+  perform_action('enter_text_for_description', text, content_description)
 end
 
 Then /^I enter "([^\"]*)" into "([^\"]*)"$/ do |text, content_description|
-  enter_text("android.widget.EditText {contentDescription LIKE[c] '#{content_description}'}", text)
+  perform_action('enter_text_for_description', text, content_description)
 end
 
 Then /^I enter "([^\"]*)" into input field number (\d+)$/ do |text, index|
-  enter_text("android.widget.EditText index:#{index.to_i-1}", text)
+  perform_action('enter_text_for_index', text, index)
 end
 
 Then /^I enter text "([^\"]*)" into field with id "([^\"]*)"$/ do |text, id|
-  enter_text("android.widget.EditText id:'#{id}'", text)
+  perform_action('enter_text_for_id', text, id)
 end
 
 Then /^I clear "([^\"]*)"$/ do |identifier|
-  clear_text_in("android.widget.EditText marked:'#{identifier}'}")
+  perform_action('clear_text_for_marked', text, identifier)
 end
 
 Then /^I clear input field number (\d+)$/ do |index|
-  clear_text_in("android.widget.EditText index:#{index.to_i-1}")
+  perform_action('clear_text_for_index', index)
 end
 
 Then /^I clear input field with id "([^\"]*)"$/ do |id|
-  clear_text_in("android.widget.EditText id:'#{id}'")
+  perform_action('clear_text_for_id', id)
 end

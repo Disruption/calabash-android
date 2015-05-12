@@ -11,10 +11,10 @@ import android.webkit.WebView;
 
 public class WebViewCaptorMatcher extends TypeSafeMatcher<View> {
 
-	private final List<View> affectedViews = new ArrayList<View>();
+	private final List<WebView> affectedViews = new ArrayList<WebView>();
 	private boolean hasAlreadyReturnedTrue = false;
 	
-	public List<View> getCapturedViews() {
+	public List<WebView> getCapturedViews() {
 		return affectedViews;
 	}
 
@@ -27,7 +27,7 @@ public class WebViewCaptorMatcher extends TypeSafeMatcher<View> {
 	@Override
 	public boolean matchesSafely(View view) {
 		if (view instanceof WebView) {
-			affectedViews.add(view);
+			affectedViews.add((WebView) view);
 		}
 
 		if (!hasAlreadyReturnedTrue) {

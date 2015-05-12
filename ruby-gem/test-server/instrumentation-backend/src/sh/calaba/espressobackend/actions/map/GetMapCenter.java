@@ -6,22 +6,22 @@ import sh.calaba.espressobackend.actions.Action;
 
 /**
  * Returns latitude, longitude (in decimal degrees) in the "bonusInformation"
- * 
+ *
  * @author Nicholas Albion
  */
 public class GetMapCenter implements Action {
 
-	@Override
-	public Result execute(String... args) {
-		double[] center = EspressoInstrumentationBackend.mapViewUtils.getMapCenter();
+    @Override
+    public Result execute(String... args) {
+        double[] center = EspressoInstrumentationBackend.mapViewUtils.getMapCenter();
         Result result = new Result(true);
-        result.addBonusInformation( Double.toString(center[0]) );
-        result.addBonusInformation( Double.toString(center[1]) );
+        result.addBonusInformation(Double.toString(center[0]));
+        result.addBonusInformation(Double.toString(center[1]));
         return result;
-	}
+    }
 
-	@Override
-	public String key() {
-		return "get_map_center";
-	}
+    @Override
+    public String key() {
+        return "get_map_center";
+    }
 }

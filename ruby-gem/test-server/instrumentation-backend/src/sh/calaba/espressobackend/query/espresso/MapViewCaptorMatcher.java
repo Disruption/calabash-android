@@ -13,9 +13,9 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewManager;
 
-import com.google.android.apps.common.testing.ui.espresso.UiController;
-import com.google.android.apps.common.testing.ui.espresso.ViewAction;
-import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
+import android.support.test.espresso.UiController;
+import android.support.test.espresso.ViewAction;
+import android.support.test.espresso.matcher.ViewMatchers;
 import com.google.android.maps.MapView;
 
 public class MapViewCaptorMatcher extends TypeSafeMatcher<View> {

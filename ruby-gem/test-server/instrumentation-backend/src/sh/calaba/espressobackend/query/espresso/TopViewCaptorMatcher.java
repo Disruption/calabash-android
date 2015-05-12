@@ -13,15 +13,15 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewManager;
 
-import com.google.android.apps.common.testing.ui.espresso.UiController;
-import com.google.android.apps.common.testing.ui.espresso.ViewAction;
-import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
+import android.support.test.espresso.UiController;
+import android.support.test.espresso.ViewAction;
+import android.support.test.espresso.matcher.ViewMatchers;
 
 public class TopViewCaptorMatcher extends TypeSafeMatcher<View> {
 
 	private final List<View> affectedViews = new ArrayList<View>();
 	private boolean hasAlreadyReturnedTrue = false;
-	
+
 	public List<View> getCapturedViews() {
 		return affectedViews;
 	}
@@ -37,7 +37,9 @@ public class TopViewCaptorMatcher extends TypeSafeMatcher<View> {
 		if (view.getParent() == null
 				|| view.getParent().getClass().toString().contains("ViewRoot")
 				|| view.getParent().getClass().toString().contains("DecorView")) {
-			affectedViews.add(view);
+			if (!affectedViews.contains(view)) {
+				affectedViews.add(view);
+			}
 		}
 
 		if (!hasAlreadyReturnedTrue) {

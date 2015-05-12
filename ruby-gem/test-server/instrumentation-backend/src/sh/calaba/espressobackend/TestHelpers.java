@@ -1,7 +1,7 @@
 package sh.calaba.espressobackend;
 
-import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withContentDescription;
-import static com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -15,7 +15,7 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.TextView;
 
-import com.google.android.apps.common.testing.ui.espresso.Espresso;
+import android.support.test.espresso.Espresso;
 
 public class TestHelpers {
 
@@ -35,7 +35,7 @@ public class TestHelpers {
     public static View getViewByDescription(String description) {
         ViewCaptor viewCaptor = new ViewCaptor();
         Espresso.onView(withContentDescription(description)).perform(viewCaptor);
-        return viewCaptor.getCapturedViews().isEmpty() ? null : viewCaptor.getCapturedViews().get(0);
+        return viewCaptor.getCapturedView();
     }
 
     @SuppressWarnings("unchecked")
@@ -61,7 +61,7 @@ public class TestHelpers {
 
         ViewCaptor viewCaptor = new ViewCaptor();
         Espresso.onView(withId(id)).perform(viewCaptor);
-        return viewCaptor.getCapturedViews().isEmpty() ? null : viewCaptor.getCapturedViews().get(0);
+        return viewCaptor.getCapturedView();
     }
 
     /**

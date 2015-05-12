@@ -6,9 +6,9 @@ import sh.calaba.espressobackend.Result;
 import sh.calaba.espressobackend.actions.Action;
 import android.view.Display;
 
-import com.google.android.apps.common.testing.ui.espresso.Espresso;
-import com.google.android.apps.common.testing.ui.espresso.action.Tap;
-import com.google.android.apps.common.testing.ui.espresso.matcher.ViewMatchers;
+import android.support.test.espresso.Espresso;
+import android.support.test.espresso.action.Tap;
+import android.support.test.espresso.matcher.ViewMatchers;
 
 
 public class ClickOnScreen implements Action {

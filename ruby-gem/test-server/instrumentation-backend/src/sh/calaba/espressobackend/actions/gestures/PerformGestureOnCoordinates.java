@@ -2,11 +2,11 @@ package sh.calaba.espressobackend.actions.gestures;
 
 import android.view.View;
 
-import com.google.android.apps.common.testing.ui.espresso.ViewAction;
-import com.google.android.apps.common.testing.ui.espresso.action.CoordinatesProvider;
-import com.google.android.apps.common.testing.ui.espresso.action.GeneralClickAction;
-import com.google.android.apps.common.testing.ui.espresso.action.Press;
-import com.google.android.apps.common.testing.ui.espresso.action.Tap;
+import android.support.test.espresso.ViewAction;
+import android.support.test.espresso.action.CoordinatesProvider;
+import android.support.test.espresso.action.GeneralClickAction;
+import android.support.test.espresso.action.Press;
+import android.support.test.espresso.action.Tap;
 
 class PerformGestureOnCoordinates {
 	

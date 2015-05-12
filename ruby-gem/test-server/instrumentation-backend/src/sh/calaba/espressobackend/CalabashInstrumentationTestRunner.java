@@ -2,15 +2,14 @@ package sh.calaba.espressobackend;
 
 import java.lang.reflect.Method;
 
-import com.google.android.apps.common.testing.testrunner.GoogleInstrumentationTestRunner;
-
 import android.app.Activity;
 import sh.calaba.espressobackend.actions.HttpServer;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.test.runner.AndroidJUnitRunner;
 import android.test.InstrumentationTestRunner;
 
-public class CalabashInstrumentationTestRunner extends GoogleInstrumentationTestRunner {
+public class CalabashInstrumentationTestRunner extends AndroidJUnitRunner {
 	@Override
     public void onCreate(Bundle arguments) {
 		try {

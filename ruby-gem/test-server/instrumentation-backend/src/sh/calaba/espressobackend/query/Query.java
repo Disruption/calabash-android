@@ -2,8 +2,10 @@ package sh.calaba.espressobackend.query;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
@@ -20,11 +22,15 @@ import sh.calaba.espressobackend.query.ast.UIQueryASTWith;
 import sh.calaba.espressobackend.query.ast.UIQueryDirection;
 import sh.calaba.espressobackend.query.ast.UIQueryEvaluator;
 import sh.calaba.espressobackend.query.ast.UIQueryVisibility;
-import sh.calaba.espressobackend.query.espresso.TopViewCaptorMatcher;
+import sh.calaba.espressobackend.query.espresso.AllViewsCaptorMatcher;
 import sh.calaba.espressobackend.query.espresso.ViewCaptor;
+import sh.calaba.espressobackend.query.InvocationOperation;
+import sh.calaba.espressobackend.query.Operation;
+import sh.calaba.espressobackend.query.PropertyOperation;
+import sh.calaba.espressobackend.query.QueryResult;
 import android.view.View;
 
-import com.google.android.apps.common.testing.ui.espresso.Espresso;
+import android.support.test.espresso.Espresso;
 
 public class Query {
 
@@ -159,15 +165,29 @@ public class Query {
 	}
 
 	public List<View> rootViews() {
-		TopViewCaptorMatcher viewCaptor = new TopViewCaptorMatcher();
+		Set<View> parents = new HashSet<View>();
+		AllViewsCaptorMatcher viewCaptor = new AllViewsCaptorMatcher();
 		Espresso.onView(viewCaptor).perform(new ViewCaptor());
-		return viewCaptor.getCapturedViews();
+		
+		for (View v : viewCaptor.getCapturedViews()) {
+			View parent = getTopParent(v);
+			parents.add(parent);
+		}
+
+		List<View> results = new ArrayList<View>(parents);
+		return results;
 	}
+	
+	/**
+	 * Returns the absolute top parent {@code View} in for a given {@code View}.
+	 *
+	 * @param view the {@code View} whose top parent is requested
+	 * @return the top parent {@code View}
+	 */
 
 	public View getTopParent(View view) {
 		if (view.getParent() != null
-				&& !view.getParent().getClass().getName()
-						.equals("android.view.ViewRoot")) {
+				&& view.getParent() instanceof android.view.View) {
 			return getTopParent((View) view.getParent());
 		} else {
 			return view;
