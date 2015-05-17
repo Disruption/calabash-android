@@ -40,7 +40,7 @@ public class SetDateOnPickerWithIndex implements Action {
 
     @Override
     public String key() {
-        return "set_date_with_index";
+        return "set_date_on_picker";
     }
     
 }

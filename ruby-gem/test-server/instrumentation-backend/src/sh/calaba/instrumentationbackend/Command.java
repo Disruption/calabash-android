@@ -6,9 +6,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import android.os.Looper;
 import sh.calaba.instrumentationbackend.actions.Action;
 
-
-
-
 public class Command {
     private String line;
     private String command;

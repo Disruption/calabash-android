@@ -42,10 +42,13 @@ public class Actions {
 
     @SuppressWarnings("rawtypes")
     private void addAction(String className) throws Exception {
-        Class action = Class.forName(className);
-        if (isAction(action)) {
-            put((Action) action.newInstance());
-        }
+    	int firstIndex = className.indexOf("sh.calaba.instrumentationbackend");
+    	if (firstIndex != -1) {
+	        Class action = Class.forName(className.substring(firstIndex));
+	        if (isAction(action)) {
+	            put((Action) action.newInstance());
+	        }
+    	}
     }
 
     @SuppressWarnings("rawtypes")
