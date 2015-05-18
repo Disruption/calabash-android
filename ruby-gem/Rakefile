@@ -26,22 +26,21 @@ def build
     FileUtils.cp_r(calabash_js_dir, backend_assets_dir)
 
     backend_src_dir = File.join(backend_dir, 'src')
-    backends = %w(instrumentationbackend espressobackend)
-    backend_actions = backends.collect { |b| "#{backend_src_dir}/sh/calaba/#{b}/actions" }
-
     version_token = '####VERSION####'
-    backend_actions.each do |b|
+    Dir.chdir(backend_src_dir) do
+      backends = %w(instrumentationbackend espressobackend)
+      backend_actions_dirs = backends.collect { |b| "sh/calaba/#{b}/actions" }
+      backend_actions_dirs.each do |b|
         file = "#{b}/version/Version.java"
         data = File.open(file, 'r') { |f| f.read }
-        raise "No #{version_token} found in #{file}" unless data.gsub!(version_token, Calabash::Android::VERSION)
+        raise "No #{version_token} found in #{backend_src_dir}/#{file}" unless data.gsub!(version_token, Calabash::Android::VERSION)
         File.open(file, 'w') { |f| f.write(data) }
+      end
+
+      action_java_files = Dir.glob(backend_actions_dirs.collect { |v| "#{v}/**/*.java" })
+      action_classes = action_java_files.collect {|s| s.gsub('.java', '').gsub('/', '.')}
+      File.open(File.join(backend_assets_dir, 'actions'), 'w') { |a| a << action_classes.join("\n") }
     end
-    
-    action_java_files = Dir.glob(backend_actions.collect { |v| "#{v}/**/*.java" })
-    action_classes = action_java_files.collect do |s|
-      s.gsub( "#{backend_src_dir}/", '').gsub('.java', '').gsub('/', '.')
-    end
-    File.open(File.join(backend_assets_dir, 'actions'), 'w') { |a| a << action_classes.join("\n") }
 
     args = [
       Env.gradle_path,
