@@ -173,16 +173,23 @@ public class EspressoInstrumentationBackend extends ActivityInstrumentationTestC
     }
     
     public static Activity getCurrentActivity(){
-        instrumentation.runOnMainSync(new Runnable() {
-            public void run() {
-                Collection<Activity> resumedActivities = ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED);
-                for (Activity activity : resumedActivities){
-                    currentActivity = activity;
-                    break;
-                }
-            }
-        });
-
+    	if (Looper.myLooper() == Looper.getMainLooper()) {
+            Collection<Activity> resumedActivities = ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED);
+            for (Activity activity : resumedActivities){
+                currentActivity = activity;
+                break;
+            }	
+    	} else {
+	        instrumentation.runOnMainSync(new Runnable() {
+	            public void run() {
+	                Collection<Activity> resumedActivities = ActivityLifecycleMonitorRegistry.getInstance().getActivitiesInStage(Stage.RESUMED);
+	                for (Activity activity : resumedActivities){
+	                    currentActivity = activity;
+	                    break;
+	                }
+	            }
+	        });
+    	}
         return currentActivity;
     }
 
