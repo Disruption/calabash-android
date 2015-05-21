@@ -479,6 +479,9 @@ public class BeanPropertyWriter
      */
     public final Object get(Object bean) throws Exception
     {
+        if (bean == null) {
+            return null;
+        }
         if (_accessorMethod != null) {
             return _accessorMethod.invoke(bean);
         }

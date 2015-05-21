@@ -33,7 +33,7 @@ public class SetDateOnPickerWithDescription implements Action {
         }
 
         DatePicker datePicker = (DatePicker) queryResult.getResult().get(0);
-		datePicker.updateDate(date.getYear(), date.getMonth(), date.getDate());
+		datePicker.updateDate(date.getYear() + 1900, date.getMonth(), date.getDate());
 
         return Result.successResult();
     }

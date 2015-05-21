@@ -266,7 +266,7 @@ public class SerializationConfig
          *
          * @since 1.4
          */
-        FAIL_ON_EMPTY_BEANS(true),
+        FAIL_ON_EMPTY_BEANS(false),
 
         /**
          * Feature that determines whether Jackson code should catch

@@ -159,8 +159,8 @@ public class POJOPropertyBuilder
                     continue;
                 }
             }
-            throw new IllegalArgumentException("Conflicting getter definitions for property \""+getName()+"\": "
-                    +getter.getFullName()+" vs "+nextGetter.getFullName());
+            //throw new IllegalArgumentException("Conflicting getter definitions for property \""+getName()+"\": "
+            //        +getter.getFullName()+" vs "+nextGetter.getFullName());
         }
         return getter;
     }

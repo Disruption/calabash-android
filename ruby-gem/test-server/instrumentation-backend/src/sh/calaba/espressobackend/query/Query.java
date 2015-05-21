@@ -11,6 +11,7 @@ import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
+import org.hamcrest.Matchers;
 
 import sh.calaba.espressobackend.query.antlr.UIQueryLexer;
 import sh.calaba.espressobackend.query.antlr.UIQueryParser;
@@ -22,6 +23,7 @@ import sh.calaba.espressobackend.query.ast.UIQueryASTWith;
 import sh.calaba.espressobackend.query.ast.UIQueryDirection;
 import sh.calaba.espressobackend.query.ast.UIQueryEvaluator;
 import sh.calaba.espressobackend.query.ast.UIQueryVisibility;
+import sh.calaba.espressobackend.query.espresso.AllRootsCaptorMatcher;
 import sh.calaba.espressobackend.query.espresso.AllViewsCaptorMatcher;
 import sh.calaba.espressobackend.query.espresso.ViewCaptor;
 import sh.calaba.espressobackend.query.InvocationOperation;
@@ -31,6 +33,10 @@ import sh.calaba.espressobackend.query.QueryResult;
 import android.view.View;
 
 import android.support.test.espresso.Espresso;
+import android.support.test.espresso.Root;
+import static org.hamcrest.Matchers.anything;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 
 public class Query {
 
@@ -167,13 +173,17 @@ public class Query {
 	public List<View> rootViews() {
 		Set<View> parents = new HashSet<View>();
 		AllViewsCaptorMatcher viewCaptor = new AllViewsCaptorMatcher();
-		Espresso.onView(viewCaptor).perform(new ViewCaptor());
-		
-		for (View v : viewCaptor.getCapturedViews()) {
-			View parent = getTopParent(v);
-			parents.add(parent);
-		}
+        AllRootsCaptorMatcher allRootsCaptorMatcher = new AllRootsCaptorMatcher();
+		Espresso.onView(viewCaptor).inRoot(allRootsCaptorMatcher).perform(new ViewCaptor());
 
+        for (Root root : allRootsCaptorMatcher.getCapturedViews()) {
+            /*Espresso.onView(viewCaptor).inRoot(equalTo(root)).perform(new ViewCaptor());
+            for (View v : viewCaptor.getCapturedViews()) {
+                View parent = getTopParent(v);
+                parents.add(parent);
+            }*/
+            parents.add(root.getDecorView());
+        }
 		List<View> results = new ArrayList<View>(parents);
 		return results;
 	}

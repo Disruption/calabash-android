@@ -33,7 +33,7 @@ public class DatePickerSetter implements ViewAction {
 	@Override
 	public void perform(UiController controller, View affectedView) {
 		DatePicker datePicker = (DatePicker) affectedView;
-		datePicker.updateDate(date.getYear(), date.getMonth(), date.getDate());
+		datePicker.updateDate(date.getYear() + 1900, date.getMonth(), date.getDate());
 	}
 
 }
