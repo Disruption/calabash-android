@@ -18,7 +18,7 @@ public class SetActivityOrientation implements Action {
         if (orientation.equals("landscape")) {
             EspressoInstrumentationBackend.getCurrentActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         } else if(orientation.equals("portrait")) {
-            EspressoInstrumentationBackend.getCurrentActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            EspressoInstrumentationBackend.getCurrentActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         } else {
             throw new IllegalArgumentException("Invalid orientation '" + orientation + "'. Use 'landscape' or 'portrait'");
         }
